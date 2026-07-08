@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Matita Rossa — Correttore Ortografico e Grammaticale Italiano</title>
+  <meta name="description" content="Correttore online per testi italiani: trova errori ortografici e grammaticali con un clic e applica le correzioni suggerite. Analisi approfondita parola per parola.">
+  <base href="./">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="La Matita Rossa — Correttore Ortografico e Grammaticale Italiano">
+  <meta property="og:description" content="Correttore online per testi italiani: trova errori ortografici e grammaticali con un clic e applica le correzioni suggerite.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cristianporco.it/app/correttore/">
+  <meta property="og:locale" content="it_IT">
+
+  <link rel="canonical" href="https://cristianporco.it/app/correttore/">
+
+  <!-- Fonts: Crimson Pro (display), Inter (body), JetBrains Mono (code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ---------- CSS Variables ---------- */
+    :root {
+      --color-paper: #FEFDF8;
+      --color-ink: #1E1B18;
+      --color-red: #D64045;
+      --color-red-light: #FDE8E8;
+      --color-red-dark: #B33035;
+      --color-amber: #E9A23B;
+      --color-amber-light: #FDF3E1;
+      --color-sage: #3D8C40;
+      --color-sage-light: #E8F5E8;
+      --color-slate: #6B7177;
+      --color-slate-light: #F0EFEC;
+      --color-border: #D9D5CC;
+      --color-surface: #F7F5F0;
+      --color-white: #FFFFFF;
+
+      --font-display: 'Crimson Pro', 'Georgia', 'Times New Roman', serif;
+      --font-body: 'Inter', 'Helvetica Neue', 'Arial', sans-serif;
+      --font-mono: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+    }
+
+    /* ---------- Reset & Base ---------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ---------- Focus ---------- */
+    :focus-visible {
+      outline: 2.5px solid var(--color-red);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    /* ---------- Reduced motion ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ---------- Layout ---------- */
+    header {
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-white);
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .header-inner {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+    }
+
+    .logo-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .brand h1 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-ink);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+    }
+
+    .brand .eyebrow {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-slate);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    main {
+      flex: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: var(--space-5) var(--space-4);
+      width: 100%;
+    }
+
+    footer {
+      border-top: 1px solid var(--color-border);
+      background: var(--color-white);
+      padding: var(--space-3) var(--space-4);
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--color-slate);
+    }
+
+    /* ---------- Textarea (Paper-like) ---------- */
+    .editor-area {
+      position: relative;
+      margin-bottom: var(--space-4);
+    }
+
+    .editor-area label {
+      display: block;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--color-ink);
+      margin-bottom: var(--space-2);
+    }
+
+    .textarea-wrapper {
+      position: relative;
+      background: var(--color-white);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: border-color 200ms ease, box-shadow 200ms ease;
+      /* Lined paper effect */
+      background-image:
+        repeating-linear-gradient(
+          transparent,
+          transparent 27px,
+          #E8E5DF 27px,
+          #E8E5DF 28px
+        );
+      background-position: 0 8px;
+    }
+
+    .textarea-wrapper:focus-within {
+      border-color: var(--color-red);
+      box-shadow: 0 0 0 3px rgba(214, 64, 69, 0.12);
+    }
+
+    .textarea-wrapper.has-errors {
+      border-color: var(--color-amber);
+    }
+
+    .textarea-wrapper.all-correct {
+      border-color: var(--color-sage);
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 220px;
+      padding: var(--space-4) var(--space-4) var(--space-4) 52px;
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--color-ink);
+      background: transparent;
+      border: none;
+      resize: vertical;
+      outline: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Red margin line (like a teacher's notebook) */
+    .textarea-wrapper::before {
+      content: '';
+      position: absolute;
+      left: 40px;
+      top: 0;
+      bottom: 0;
+      width: 1.5px;
+      background: var(--color-red);
+      opacity: 0.25;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    textarea::placeholder {
+      color: #B0ACA4;
+      font-style: italic;
+    }
+
+    /* ---------- Button ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 10px 22px;
+      font-family: var(--font-body);
+      font-size: 0.925rem;
+      font-weight: 600;
+      line-height: 1.3;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      min-height: 44px;
+      min-width: 44px;
+      transition: background-color 200ms ease, transform 150ms ease, box-shadow 200ms ease;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: var(--color-red);
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover {
+      background: var(--color-red-dark);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:disabled {
+      background: #D1CEC8;
+      color: #999590;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: var(--color-slate-light);
+      color: var(--color-ink);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-border);
+    }
+
+    .btn-small {
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      min-height: 36px;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--color-slate);
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+
+    .btn-ghost:hover {
+      color: var(--color-red);
+      background: var(--color-red-light);
+    }
+
+    .btn-success {
+      background: var(--color-sage);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #2E7331;
+    }
+
+    /* ---------- Controls Row ---------- */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+
+    .controls-row .spacer {
+      flex: 1;
+    }
+
+    .char-count {
+      font-size: 0.8rem;
+      color: var(--color-slate);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---------- Results Area ---------- */
+    .results {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      margin-top: var(--space-4);
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .results-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .badge-errors {
+      background: var(--color-red-light);
+      color: var(--color-red-dark);
+    }
+
+    .badge-clean {
+      background: var(--color-sage-light);
+      color: var(--color-sage);
+    }
+
+    .results-summary {
+      font-size: 0.875rem;
+      color: var(--color-slate);
+    }
+
+    /* ---------- Highlighted Text Display ---------- */
+    .text-display {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      position: relative;
+      min-height: 80px;
+    }
+
+    .error-word {
+      position: relative;
+      color: var(--color-red-dark);
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-color: var(--color-red);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+      text-decoration-style: wavy;
+      border-radius: 2px;
+      padding: 1px 0;
+      transition: background-color 150ms ease;
+    }
+
+    .error-word:hover,
+    .error-word:focus {
+      background: var(--color-red-light);
+    }
+
+    .error-word.active {
+      background: var(--color-amber-light);
+      text-decoration-color: var(--color-amber);
+      outline: 2px solid var(--color-amber);
+      outline-offset: 1px;
+      border-radius: 3px;
+    }
+
+    /* ---------- Suggestion Popover ---------- */
+    .suggestion-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin-top: var(--space-2);
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .suggestion-card::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 24px;
+      width: 10px;
+      height: 10px;
+      background: var(--color-white);
+      border-left: 1px solid var(--color-border);
+      border-top: 1px solid var(--color-border);
+      transform: rotate(45deg);
+    }
+
+    .suggestion-card .error-text {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--color-red);
+      font-weight: 500;
+      margin-bottom: var(--space-1);
+    }
+
+    .suggestion-card .msg {
+      font-size: 0.825rem;
+      color: var(--color-slate);
+      margin-bottom: var(--space-2);
+    }
+
+    .suggestion-card .suggestion-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .suggestion-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--color-ink);
+      background: var(--color-surface);
+      cursor: pointer;
+      transition: all 150ms ease;
+      min-height: 36px;
+    }
+
+    .suggestion-chip:hover,
+    .suggestion-chip:focus-visible {
+      background: var(--color-sage-light);
+      border-color: var(--color-sage);
+      color: var(--color-sage);
+    }
+
+    .suggestion-chip svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ---------- Error list panel ---------- */
+    .error-list {
+      list-style: none;
+      margin-top: var(--space-3);
+    }
+
+    .error-list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: background-color 150ms ease;
+    }
+
+    .error-list-item:hover {
+      background: var(--color-slate-light);
+      margin: 0 calc(-1 * var(--space-4));
+      padding-left: var(--space-4);
+      padding-right: var(--space-4);
+    }
+
+    .error-list-item:last-child {
+      border-bottom: none;
+    }
+
+    .error-num {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-red);
+      width: 28px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .error-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .error-info .error-word-display {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--color-red-dark);
+      font-size: 0.925rem;
+    }
+
+    .error-info .error-msg {
+      font-size: 0.8rem;
+      color: var(--color-slate);
+      margin-top: 2px;
+    }
+
+    .error-info .error-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+      margin-top: var(--space-2);
+    }
+
+    .error-info .mini-chip {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      background: var(--color-surface);
+      cursor: pointer;
+      transition: all 150ms ease;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .error-info .mini-chip:hover,
+    .error-info .mini-chip:focus-visible {
+      background: var(--color-sage-light);
+      border-color: var(--color-sage);
+      color: var(--color-sage);
+    }
+
+    .error-type-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+
+    .type-spelling {
+      background: var(--color-amber-light);
+      color: #A36A1A;
+    }
+
+    .type-grammar {
+      background: #E8E0F0;
+      color: #5B3A8C;
+    }
+
+    /* ---------- Toast ---------- */
+    .toast {
+      position: fixed;
+      bottom: var(--space-6);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-ink);
+      color: white;
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      font-weight: 500;
+      z-index: 1000;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transition: opacity 250ms ease, transform 250ms ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .toast.success {
+      background: var(--color-sage);
+    }
+
+    /* ---------- Loading ---------- */
+    .btn .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 500ms linear infinite;
+    }
+
+    .btn.loading .spinner {
+      display: inline-block;
+    }
+
+    .btn.loading .btn-label {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 600px) {
+      .header-inner {
+        gap: var(--space-2);
+      }
+      .brand h1 {
+        font-size: 1.2rem;
+      }
+      .brand .eyebrow {
+        font-size: 0.7rem;
+      }
+      .logo-icon {
+        width: 30px;
+        height: 30px;
+      }
+      textarea {
+        min-height: 180px;
+        font-size: 0.925rem;
+        padding-left: 42px;
+      }
+      .textarea-wrapper::before {
+        left: 32px;
+      }
+      .controls-row {
+        gap: var(--space-1);
+      }
+      .btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+      }
+      .text-display {
+        font-size: 0.925rem;
+      }
+      .error-list-item {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <div class="logo-icon" aria-hidden="true">
+      <!-- Red pencil SVG -->
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="28" width="30" height="4" rx="2" fill="#E9A23B" transform="rotate(-45 19 30)"/>
+        <rect x="8" y="12" width="4" height="24" rx="1" fill="#D64045" transform="rotate(-45 10 24)"/>
+        <path d="M30 4L36 10L16 30L10 24L30 4Z" fill="#D64045"/>
+        <path d="M12 28L16 32L14 34L10 30L12 28Z" fill="#1E1B18"/>
+      </svg>
+    </div>
+    <div class="brand">
+      <h1>La Matita Rossa</h1>
+      <p class="eyebrow">Correttore Ortografico · Grammaticale · Italiano</p>
+    </div>
+  </div>
+</header>
+
+<!-- Main -->
+<main>
+  <!-- Editor -->
+  <div class="editor-area">
+    <label for="text-input">Incolla o scrivi il tuo testo in italiano</label>
+    <div class="textarea-wrapper" id="textarea-wrapper">
+      <textarea
+        id="text-input"
+        placeholder="Scrivi o incolla qui il testo da correggere… es: Oggi èna bela giornata"
+        aria-describedby="char-count"
+        rows="8"
+      ></textarea>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-row">
+    <button class="btn btn-primary" id="btn-analyze" type="button">
+      <span class="spinner" aria-hidden="true"></span>
+      <span class="btn-label">Analizza il testo</span>
+    </button>
+    <button class="btn btn-secondary" id="btn-clear" type="button" style="display:none;">
+      Cancella
+    </button>
+    <span class="spacer"></span>
+    <span class="char-count" id="char-count" aria-live="polite">0 caratteri</span>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results" style="display:none;" aria-live="polite">
+    <div class="results-header">
+      <span class="results-badge badge-errors" id="results-badge" style="display:none;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v5M8 11v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span id="error-count">0 errori</span>
+      </span>
+      <span class="results-badge badge-clean" id="results-clean" style="display:none;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Testo corretto
+      </span>
+      <span class="results-summary" id="results-summary"></span>
+    </div>
+
+    <!-- Highlighted text with inline corrections -->
+    <div class="text-display" id="text-display"></div>
+
+    <!-- Active suggestion card -->
+    <div class="suggestion-card" id="suggestion-card" style="display:none;" role="dialog" aria-label="Suggerimento correzione">
+      <div class="error-text" id="sug-error-text"></div>
+      <div class="msg" id="sug-message"></div>
+      <div class="suggestion-list" id="sug-list"></div>
+    </div>
+
+    <!-- Apply all button -->
+    <div style="margin-top: var(--space-3);" id="apply-all-row" hidden>
+      <button class="btn btn-success" id="btn-apply-all" type="button">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Applica tutte le correzioni
+      </button>
+    </div>
+
+    <!-- Error list -->
+    <ul class="error-list" id="error-list"></ul>
+  </div>
+
+  <!-- Empty state (visible only before first analysis) -->
+  <div id="empty-state" style="text-align:center;padding:var(--space-8) var(--space-4);color:var(--color-slate);">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" style="margin-bottom:var(--space-3);opacity:0.4;">
+      <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <path d="M16 38L22 26L32 28L26 16L16 38Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>
+    <p style="font-size:0.925rem;">La <strong>Matita Rossa</strong> analizza il tuo testo parola per parola,<br>segnalando errori ortografici e grammaticali con suggerimenti puntuali.</p>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer>
+  <p>La Matita Rossa &mdash; Correttore ortografico e grammaticale per la lingua italiana. Analisi lato server con Python.</p>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="assertive"></div>
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "La Matita Rossa",
+  "url": "https://cristianporco.it/app/correttore/",
+  "description": "Correttore ortografico e grammaticale online per testi italiani con suggerimenti automatici.",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "All",
+  "inLanguage": "it",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+}
+</script>
+
+<!-- Application Script -->
+<script>
+  (function() {
+    'use strict';
+
+    // ---------- DOM refs ----------
+    const textInput = document.getElementById('text-input');
+    const btnAnalyze = document.getElementById('btn-analyze');
+    const btnClear = document.getElementById('btn-clear');
+    const btnApplyAll = document.getElementById('btn-apply-all');
+    const charCount = document.getElementById('char-count');
+    const textareaWrapper = document.getElementById('textarea-wrapper');
+    const results = document.getElementById('results');
+    const emptyState = document.getElementById('empty-state');
+    const resultsBadge = document.getElementById('results-badge');
+    const resultsClean = document.getElementById('results-clean');
+    const resultsSummary = document.getElementById('results-summary');
+    const errorCountEl = document.getElementById('error-count');
+    const textDisplay = document.getElementById('text-display');
+    const suggestionCard = document.getElementById('suggestion-card');
+    const sugErrorText = document.getElementById('sug-error-text');
+    const sugMessage = document.getElementById('sug-message');
+    const sugList = document.getElementById('sug-list');
+    const errorList = document.getElementById('error-list');
+    const applyAllRow = document.getElementById('apply-all-row');
+    const toast = document.getElementById('toast');
+
+    // ---------- State ----------
+    let currentErrors = [];
+    let originalText = '';
+    let activeErrorIdx = -1;
+    let toastTimer = null;
+
+    // ---------- Char count ----------
+    textInput.addEventListener('input', function() {
+      const len = textInput.value.length;
+      charCount.textContent = len + ' caratter' + (len === 1 ? 'e' : 'i');
+      updateClearButton();
+    });
+
+    function updateClearButton() {
+      btnClear.style.display = textInput.value.length > 0 ? '' : 'none';
+    }
+
+    // ---------- Clear ----------
+    btnClear.addEventListener('click', function() {
+      textInput.value = '';
+      charCount.textContent = '0 caratteri';
+      textInput.focus();
+      resetResults();
+      updateClearButton();
+    });
+
+    function resetResults() {
+      currentErrors = [];
+      originalText = '';
+      activeErrorIdx = -1;
+      results.style.display = 'none';
+      emptyState.style.display = '';
+      textareaWrapper.classList.remove('has-errors', 'all-correct');
+      hideSuggestionCard();
+      resultsBadge.style.display = 'none';
+      resultsClean.style.display = 'none';
+      applyAllRow.hidden = true;
+      errorList.innerHTML = '';
+      textDisplay.innerHTML = '';
+    }
+
+    // ---------- Analyze ----------
+    btnAnalyze.addEventListener('click', analyzeText);
+
+    // Allow Ctrl+Enter to analyze
+    textInput.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        analyzeText();
+      }
+    });
+
+    async function analyzeText() {
+      const text = textInput.value.trim();
+      if (!text) {
+        showToast('Inserisci del testo da analizzare.', false);
+        textInput.focus();
+        return;
+      }
+
+      // Loading state
+      btnAnalyze.classList.add('loading');
+      btnAnalyze.disabled = true;
+
+      try {
+        const response = await fetch('api/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Errore del server (' + response.status + ')');
+        }
+
+        const data = await response.json();
+        originalText = text;
+        currentErrors = data.errors || [];
+        renderResults(data);
+      } catch (err) {
+        showToast('Errore di connessione: ' + err.message, false);
+        console.error(err);
+      } finally {
+        btnAnalyze.classList.remove('loading');
+        btnAnalyze.disabled = false;
+      }
+    }
+
+    // ---------- Render Results ----------
+    function renderResults(data) {
+      results.style.display = 'block';
+      emptyState.style.display = 'none';
+      hideSuggestionCard();
+      activeErrorIdx = -1;
+
+      const errorCount = data.error_count;
+
+      // Textarea wrapper state
+      textareaWrapper.classList.remove('has-errors', 'all-correct');
+      if (errorCount > 0) {
+        textareaWrapper.classList.add('has-errors');
+      } else {
+        textareaWrapper.classList.add('all-correct');
+      }
+
+      // Badge
+      if (errorCount > 0) {
+        resultsBadge.style.display = '';
+        resultsClean.style.display = 'none';
+        errorCountEl.textContent = errorCount + ' error' + (errorCount === 1 ? 'e' : 'i');
+        resultsSummary.textContent = 'su ' + data.total_words + ' parole analizzate';
+      } else {
+        resultsBadge.style.display = 'none';
+        resultsClean.style.display = '';
+        resultsSummary.textContent = 'Nessun errore trovato — testo impeccabile!';
+      }
+
+      // Apply all button
+      applyAllRow.hidden = errorCount === 0;
+
+      // Highlighted text
+      renderHighlightedText();
+
+      // Error list
+      renderErrorList();
+    }
+
+    // ---------- Highlighted Text ----------
+    function renderHighlightedText() {
+      if (currentErrors.length === 0) {
+        textDisplay.innerHTML = '<span style="color:var(--color-slate)">' + escapeHtml(originalText) + '</span>';
+        return;
+      }
+
+      // Sort errors by start position
+      const sorted = [...currentErrors].sort((a, b) => a.start - b.start);
+
+      let html = '';
+      let pos = 0;
+
+      for (let i = 0; i < sorted.length; i++) {
+        const err = sorted[i];
+        // Add text before this error
+        if (err.start > pos) {
+          html += escapeHtml(originalText.slice(pos, err.start));
+        }
+        // Add the error with highlight
+        html += '<span class="error-word" data-error-idx="' + i + '" tabindex="0" role="button" aria-describedby="error-desc-' + i + '">';
+        html += escapeHtml(err.text);
+        html += '</span>';
+        pos = err.end;
+      }
+
+      // Remaining text
+      if (pos < originalText.length) {
+        html += escapeHtml(originalText.slice(pos));
+      }
+
+      textDisplay.innerHTML = html;
+
+      // Attach click handlers to error words
+      textDisplay.querySelectorAll('.error-word').forEach(function(el) {
+        el.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const idx = parseInt(this.getAttribute('data-error-idx'), 10);
+          showSuggestionForError(idx);
+        });
+        el.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const idx = parseInt(this.getAttribute('data-error-idx'), 10);
+            showSuggestionForError(idx);
+          }
+        });
+      });
+
+      // Click outside to dismiss
+      document.addEventListener('click', function(e) {
+        if (!suggestionCard.contains(e.target) && !e.target.classList.contains('error-word')) {
+          hideSuggestionCard();
+        }
+      }, { once: false });
+    }
+
+    // ---------- Error List ----------
+    function renderErrorList() {
+      errorList.innerHTML = '';
+
+      if (currentErrors.length === 0) return;
+
+      currentErrors.forEach(function(err, i) {
+        const li = document.createElement('li');
+        li.className = 'error-list-item';
+        li.setAttribute('tabindex', '0');
+        li.setAttribute('role', 'button');
+        li.setAttribute('aria-label', 'Errore: ' + err.text + '. ' + err.message);
+
+        const typeClass = err.type === 'spelling' ? 'type-spelling' : 'type-grammar';
+        const typeLabel = err.type === 'spelling' ? 'Ortografia' : 'Grammatica';
+
+        let suggestionsHtml = '';
+        if (err.suggestions && err.suggestions.length > 0) {
+          suggestionsHtml = '<div class="error-suggestions">' +
+            err.suggestions.slice(0, 4).map(function(s) {
+              return '<span class="mini-chip" data-fix="' + escapeAttr(s) + '" data-error-idx="' + i + '" tabindex="0" role="button">' + escapeHtml(s) + '</span>';
+            }).join('') +
+            '</div>';
+        }
+
+        li.innerHTML =
+          '<span class="error-num">' + (i + 1) + '</span>' +
+          '<div class="error-info">' +
+            '<span class="error-word-display">' + escapeHtml(err.text) + '</span>' +
+            '<span class="error-msg" id="error-desc-' + i + '">' + escapeHtml(err.message) + '</span>' +
+            suggestionsHtml +
+          '</div>' +
+          '<span class="error-type-badge ' + typeClass + '">' + typeLabel + '</span>';
+
+        li.addEventListener('click', function() {
+          showSuggestionForError(i);
+          // Scroll to the error in the text display
+          const errorWord = textDisplay.querySelector('[data-error-idx="' + i + '"]');
+          if (errorWord) {
+            errorWord.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+
+        errorList.appendChild(li);
+      });
+
+      // Attach fix chip handlers
+      errorList.querySelectorAll('.mini-chip').forEach(function(chip) {
+        chip.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const fix = this.getAttribute('data-fix');
+          const idx = parseInt(this.getAttribute('data-error-idx'), 10);
+          applyCorrection(idx, fix);
+        });
+        chip.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            const fix = this.getAttribute('data-fix');
+            const idx = parseInt(this.getAttribute('data-error-idx'), 10);
+            applyCorrection(idx, fix);
+          }
+        });
+      });
+    }
+
+    // ---------- Suggestion Card ----------
+    function showSuggestionForError(idx) {
+      if (idx < 0 || idx >= currentErrors.length) return;
+
+      activeErrorIdx = idx;
+      const err = currentErrors[idx];
+
+      // Highlight active error word in text display
+      textDisplay.querySelectorAll('.error-word').forEach(function(el) {
+        el.classList.remove('active');
+      });
+      const target = textDisplay.querySelector('[data-error-idx="' + idx + '"]');
+      if (target) {
+        target.classList.add('active');
+      }
+
+      sugErrorText.textContent = '«' + err.text + '»';
+      sugMessage.textContent = err.message;
+      sugList.innerHTML = '';
+
+      if (err.suggestions && err.suggestions.length > 0) {
+        err.suggestions.slice(0, 5).forEach(function(sug) {
+          const chip = document.createElement('span');
+          chip.className = 'suggestion-chip';
+          chip.setAttribute('tabindex', '0');
+          chip.setAttribute('role', 'button');
+          chip.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7l3 3 5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' + escapeHtml(sug);
+          chip.addEventListener('click', function() {
+            applyCorrection(idx, sug);
+          });
+          chip.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              applyCorrection(idx, sug);
+            }
+          });
+          sugList.appendChild(chip);
+        });
+      } else {
+        sugList.innerHTML = '<span style="font-size:0.825rem;color:var(--color-slate);font-style:italic;">Nessun suggerimento automatico disponibile.</span>';
+      }
+
+      suggestionCard.style.display = 'block';
+    }
+
+    function hideSuggestionCard() {
+      suggestionCard.style.display = 'none';
+      activeErrorIdx = -1;
+      textDisplay.querySelectorAll('.error-word').forEach(function(el) {
+        el.classList.remove('active');
+      });
+    }
+
+    // ---------- Apply Correction ----------
+    function applyCorrection(errorIdx, fix) {
+      if (errorIdx < 0 || errorIdx >= currentErrors.length) return;
+      if (!fix) return;
+
+      const err = currentErrors[errorIdx];
+
+      // Replace the error text in the textarea
+      const before = textInput.value.slice(0, err.start);
+      const after = textInput.value.slice(err.end);
+      const newText = before + fix + after;
+
+      textInput.value = newText;
+      // Update char count
+      charCount.textContent = newText.length + ' caratter' + (newText.length === 1 ? 'e' : 'i');
+
+      // Remove this error from the list
+      currentErrors.splice(errorIdx, 1);
+
+      // Adjust positions of remaining errors
+      const sizeDiff = fix.length - err.text.length;
+      const appliedStart = err.start;
+      // Only adjust errors that start after the applied error
+      for (let i = errorIdx; i < currentErrors.length; i++) {
+        if (currentErrors[i].start >= appliedStart) {
+          currentErrors[i].start += sizeDiff;
+          currentErrors[i].end += sizeDiff;
+        }
+      }
+
+      // Re-render
+      hideSuggestionCard();
+      renderResults({
+        errors: currentErrors,
+        total_words: countWords(newText),
+        error_count: currentErrors.length,
+      });
+      updateClearButton();
+
+      showToast('Correzione applicata: «' + fix + '»', true);
+
+      // Focus back on textarea
+      textInput.focus();
+    }
+
+    // ---------- Apply All ----------
+    btnApplyAll.addEventListener('click', function() {
+      if (currentErrors.length === 0) return;
+
+      let newText = textInput.value;
+      // Apply corrections from end to start to preserve positions
+      const sorted = [...currentErrors].sort((a, b) => b.start - a.start);
+
+      for (const err of sorted) {
+        if (err.suggestions && err.suggestions.length > 0) {
+          const fix = err.suggestions[0];
+          newText = newText.slice(0, err.start) + fix + newText.slice(err.end);
+        }
+      }
+
+      textInput.value = newText;
+      charCount.textContent = newText.length + ' caratter' + (newText.length === 1 ? 'e' : 'i');
+      currentErrors = [];
+      hideSuggestionCard();
+
+      renderResults({
+        errors: [],
+        total_words: countWords(newText),
+        error_count: 0,
+      });
+      updateClearButton();
+
+      showToast('Tutte le correzioni sono state applicate!', true);
+      textInput.focus();
+    });
+
+    // ---------- Utility ----------
+    function countWords(text) {
+      const matches = text.match(/[a-zA-ZàèéìòóùÀÈÉÌÒÓÙ']+/g);
+      return matches ? matches.length : 0;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+    function escapeAttr(str) {
+      return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function showToast(message, isSuccess) {
+      if (toastTimer) clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.className = 'toast' + (isSuccess ? ' success' : '');
+      // Force reflow
+      void toast.offsetWidth;
+      toast.classList.add('show');
+      toastTimer = setTimeout(function() {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // ---------- Initialize ----------
+    updateClearButton();
+    charCount.textContent = '0 caratteri';
+  })();
+</script>
+
+</body>
+</html>
